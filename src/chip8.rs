@@ -11,7 +11,7 @@ pub struct Chip8 {
     sound_timer: u8,
     //64 columns, 32 rows
     display: [bool; 64*32],
-    keypad: [u8; 16],
+    keypad: [bool; 16],
     pc: u16,
     index_register: u16,
     registers: [u8; 16],
@@ -44,7 +44,7 @@ impl Chip8 {
             delay_timer: 0,
             sound_timer: 0,
             display: [false; 64*32],
-            keypad: [0; 16],
+            keypad: [false; 16],
             pc: 0x200,
             index_register: 0,
             registers: [0; 16]
@@ -121,7 +121,7 @@ impl Chip8 {
             //Add to register (overflow)?
             (7, _, _, _) =>{
                 let nn = (instruction & 0x00FF) as u8;
-                self.registers[digit_2 as usize] += nn;
+                self.registers[digit_2 as usize] = self.registers[digit_2 as usize].wrapping_add(nn);
             },
             (0xA, _, _, _) =>{
                 let nnn = instruction & 0x0FFF;
@@ -225,7 +225,7 @@ impl Chip8 {
                 self.registers[digit_2 as usize] = result;
                 
             },
-            (8, _, _, 5) =>{
+            (8, _, _, 7) =>{
                 let (result, overflow) = self.registers[digit_3 as usize].overflowing_sub(self.registers[digit_2 as usize]);
                 if overflow{
                     self.registers[0xF] = 0;
@@ -258,6 +258,60 @@ impl Chip8 {
                 let nn :u8 = (instruction & 0x00FF) as u8;
                 let random_num :u8 = random();
                 self.registers[digit_2 as usize] = random_num & nn; 
+            },
+            (0xE, _, 9, 0xE) => {
+                let key = digit_2 as usize;
+                if self.keypad[key]{
+                    self.pc+=2;
+                }
+            },
+            (0xE, _, 0xA, 1) => {
+                let key = digit_2 as usize;
+                if !self.keypad[key]{
+                    self.pc+=2;
+                }
+            },  
+            (0xF, _, 0, 7) => {self.registers[digit_2 as usize] = self.delay_timer;},
+            (0xF, _, 1, 5) => {self.delay_timer = self.registers[digit_2 as usize];},
+            (0xF, _, 1, 8) => {self.sound_timer = self.registers[digit_2 as usize];},
+            (0xF, _, 1, 0xE) => {self.index_register += (self.registers[digit_2 as usize]) as u16;},
+            (0xF, _, 0, 0xA) => {
+                let mut key_pressed :bool = false;
+                for i in 0..self.keypad.len(){
+                    if self.keypad[i]{
+                        self.registers[digit_2 as usize] = i as u8;
+                        key_pressed = true;
+                        break;
+                    }
+                }
+
+                if !key_pressed{
+                    self.pc-=2;
+                }
+            },
+            (0xF, _, 2, 9) => {
+                let char = self.registers[digit_2 as usize];
+                let char_index = 0x50 + (5*char);
+                self.index_register =  char_index as u16;
+            },
+            (0xF, _, 3, 3) =>{
+                let mut num = self.registers[digit_2 as usize];
+                for i in 0..3{
+                    self.memory[(self.index_register + (2-i)) as usize] = num%10;
+                    num/=10;
+                }
+            },
+            (0xF, _, 5, 5) =>{
+                let x = digit_2 as usize;
+                for i in 0..=x{
+                    self.memory[(self.index_register + i as u16) as usize] = self.registers[i];
+                }
+            },
+            (0xF, _, 6, 5) =>{
+                let x = digit_2 as usize;
+                for i in 0..=x{
+                    self.registers[i] = self.memory[(self.index_register + i as u16) as usize];
+                }
             }
 
 

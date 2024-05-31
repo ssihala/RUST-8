@@ -11,7 +11,9 @@ use crate::interface::Interface;
 fn main() -> Result<(), String>{
 
     let mut chip = Chip8::new();
-    chip.load_rom(&String::from("IBM Logo.ch8"));
+    chip.load_rom(&String::from("3-corax+.ch8"));
+    // chip.load_rom(&String::from("IBM Logo.ch8"));
+    // chip.load_rom(&String::from("1-chip8-logo.ch8"));
     chip.load_font();
 
 
