@@ -2,6 +2,10 @@ use std::fs::File;
 use std::io::Read;
 use rand::random;
 
+pub enum Key{
+    PRESSED,
+    RELEASED
+}
 
 pub struct Chip8 {
     memory: [u8; 4096],
@@ -72,6 +76,34 @@ impl Chip8 {
         println!("{}", display);
     }
 
+    pub fn read_input(&mut self, key_name : &str, input_state: Key){
+        let mut key_num :usize;
+        match key_name{
+            "4" => key_num = 0xC,
+            "Q" => key_num = 4,
+            "W" => key_num = 5,
+            "E" => key_num = 6,
+            "R" => key_num = 0xD,
+            "A" => key_num = 7,
+            "S" => key_num = 8,
+            "D" => key_num = 9,
+            "F" => key_num = 0xE,
+            "Z" => key_num = 0xA,
+            "X" => key_num = 0,
+            "C" => key_num = 0xB,
+            "V" => key_num = 0xF,
+            _ => key_num = key_name.parse().unwrap()
+        }
+        
+        // println!("Key: {} pressed", key_num);
+    
+        match input_state{
+            Key::PRESSED => self.keypad[key_num] = true,
+            Key::RELEASED => self.keypad[key_num] = false,
+        }
+        // println!("{}", self.keypad[key_num]);
+    }
+
     pub fn load_rom(&mut self, path:&String){
         let mut file = File::open(path).expect("Invalid file path");
 
@@ -140,7 +172,7 @@ impl Chip8 {
 
                     'draw_horizontal : for bit in (0..8).rev(){
                         let pixel_bit = (sprite_pixel_data >> bit) & 1;
-                        let curr_pixel = 8-bit;
+                        let curr_pixel = 7-bit;
                         if (self.display[((x_coord + curr_pixel) + (64 *  y_coord)) as usize] as u8 & pixel_bit) != 0 {
                             self.display[((x_coord + curr_pixel)+ (64 * y_coord)) as usize] = false;
                             self.registers[0xF] = 1;
@@ -204,37 +236,39 @@ impl Chip8 {
             },
             (8, _, _, 4) =>{
                 let (result, overflow) = self.registers[digit_2 as usize].overflowing_add(self.registers[digit_3 as usize]);
-                
+
+                self.registers[digit_2 as usize] = result;
+
                 if overflow{
                     self.registers[0xF] = 1;
                 }
                 else{
                     self.registers[0xF] = 0;
                 }
-
-                self.registers[digit_2 as usize] = result;
             },
             (8, _, _, 5) =>{
                 let (result, overflow) = self.registers[digit_2 as usize].overflowing_sub(self.registers[digit_3 as usize]);
+            
+                self.registers[digit_2 as usize] = result;
+                
                 if overflow{
                     self.registers[0xF] = 0;
                 }
                 else{
                     self.registers[0xF] = 1;
                 }
-                self.registers[digit_2 as usize] = result;
-                
             },
             (8, _, _, 7) =>{
                 let (result, overflow) = self.registers[digit_3 as usize].overflowing_sub(self.registers[digit_2 as usize]);
+                
+                self.registers[digit_2 as usize] = result;
+
                 if overflow{
                     self.registers[0xF] = 0;
                 }
                 else{
                     self.registers[0xF] = 1;
                 }
-                self.registers[digit_2 as usize] = result;
-                
             },
             (8, _, _, 6) =>{
                 //Optional
@@ -260,14 +294,14 @@ impl Chip8 {
                 self.registers[digit_2 as usize] = random_num & nn; 
             },
             (0xE, _, 9, 0xE) => {
-                let key = digit_2 as usize;
-                if self.keypad[key]{
+                let key = self.registers[digit_2 as usize];
+                if self.keypad[key as usize]{
                     self.pc+=2;
                 }
             },
             (0xE, _, 0xA, 1) => {
-                let key = digit_2 as usize;
-                if !self.keypad[key]{
+                let key = self.registers[digit_2 as usize];
+                if !self.keypad[key as usize]{
                     self.pc+=2;
                 }
             },  
@@ -320,13 +354,12 @@ impl Chip8 {
         }
     }
 
-    fn decrement_timers(&mut self){
+    pub fn decrement_timers(&mut self){
         if self.delay_timer > 0{
             self.delay_timer-=1;
         }
 
         if self.sound_timer > 0{
-            todo!("BEEP");
             self.sound_timer -=1;
         }
     }
