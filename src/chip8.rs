@@ -165,7 +165,7 @@ impl Chip8 {
                 let mut y_coord :i32 = (self.registers[digit_3 as usize] % 32).into();
                 let sprite_height = digit_4;
                 self.registers[0xF] = 0;
-
+            
                 'draw_row :for i in 0..sprite_height{
                     let sprite_data_address = self.index_register + i;
                     let sprite_pixel_data :u8 = self.memory[sprite_data_address as usize];
@@ -173,15 +173,16 @@ impl Chip8 {
                     'draw_horizontal : for bit in (0..8).rev(){
                         let pixel_bit = (sprite_pixel_data >> bit) & 1;
                         let curr_pixel = 7-bit;
-                        if (self.display[((x_coord + curr_pixel) + (64 *  y_coord)) as usize] as u8 & pixel_bit) != 0 {
+                        if (self.display[((x_coord + curr_pixel) + (64 *  y_coord)) as usize] as u8 & pixel_bit) == 1 {
                             self.display[((x_coord + curr_pixel)+ (64 * y_coord)) as usize] = false;
                             self.registers[0xF] = 1;
                         }
-                        else if !self.display[((x_coord + curr_pixel) + (64*y_coord)) as usize] && pixel_bit == 1{
+                        else if !self.display[((x_coord + curr_pixel) + (64*y_coord)) as usize] && (pixel_bit == 1){
                             self.display[((x_coord + curr_pixel) + (64*y_coord)) as usize] = true;
                         }
+                        
 
-                        if x_coord == 63{
+                        if (x_coord) == 64{
                             break 'draw_row;
                         } 
                     }
@@ -347,8 +348,6 @@ impl Chip8 {
                     self.registers[i] = self.memory[(self.index_register + i as u16) as usize];
                 }
             }
-
-
 
             (_, _, _, _) => {   unimplemented!("Unimplemented opcode: {}", instruction)}
         }
