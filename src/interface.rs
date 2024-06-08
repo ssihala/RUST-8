@@ -3,13 +3,12 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::render::Canvas;
-use sdl2::sys::SDL_Scancode;
 use sdl2::video::Window;
+use std::thread::sleep;
 use std::time::{Duration, Instant};
 use sdl2::rect::Rect;
 use crate::Chip8;
 use crate::chip8::Key;
-use std::time;
 
 
 
@@ -66,26 +65,27 @@ impl Interface{
 
         let mut event = sdl_context.event_pump()?;
 
-        let mut timers_instant = Instant::now();
-        let mut timers_total_elapsed = Duration::new(0,0);
+        let mut timers_total_elapsed = Duration::new(0,0);        
+        let  cycle_time = Duration::new(0,0);
+        
 
         'running: loop {
-            for i in 0..700{
+            let cycle_curr = Instant::now();
+            let iterations = emulator.get_cycle_speed()/60;
+            for _i in 0..iterations{
                 emulator.cycle();
+                self.draw(emulator, &mut canvas);
             }
+            
 
             let curr_time = Instant::now();
-            timers_total_elapsed += curr_time - timers_instant;
+            timers_total_elapsed += curr_time - cycle_curr;
 
             if timers_total_elapsed > Duration::from_secs(1/60){
                 emulator.decrement_timers();
                 timers_total_elapsed -= Duration::from_secs(1/60);
             }
-            timers_instant = curr_time;
             
-            self.draw(emulator, &mut canvas)?;
-            
-
             for event in event.poll_iter() {
                 match event {
                     Event::Quit { .. }
@@ -138,6 +138,7 @@ impl Interface{
                     _ => {}
                 }
             }
+            sleep(Duration::from_micros(16666)-cycle_time);   
         }
         
         Ok(())

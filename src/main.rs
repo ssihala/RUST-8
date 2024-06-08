@@ -8,7 +8,7 @@ use crate::interface::Interface;
 
 fn main() -> Result<(), String>{
 
-    let mut chip = Chip8::new();
+    let mut chip = Chip8::new(500);
     chip.load_rom(&String::from("pong.rom"));
     // chip.load_rom(&String::from("2-ibm-logo.ch8"));
     // chip.load_rom(&String::from("1-chip8-logo.ch8"));

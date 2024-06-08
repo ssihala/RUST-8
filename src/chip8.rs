@@ -19,11 +19,12 @@ pub struct Chip8 {
     pc: u16,
     index_register: u16,
     registers: [u8; 16],
+    cycle_speed: i32
 }
 
 impl Chip8 {
 
-    pub fn new() -> Chip8 {
+    pub fn new(cycle_speed :i32) -> Chip8 {
         Chip8 {
             memory: [0; 4096],
             font : [
@@ -51,7 +52,8 @@ impl Chip8 {
             keypad: [false; 16],
             pc: 0x200,
             index_register: 0,
-            registers: [0; 16]
+            registers: [0; 16],
+            cycle_speed
         }
     }
 
@@ -74,6 +76,10 @@ impl Chip8 {
         }
 
         println!("{}", display);
+    }
+
+    pub fn get_cycle_speed(& self) -> i32{
+        self.cycle_speed
     }
 
     pub fn read_input(&mut self, key_name : &str, input_state: Key){
