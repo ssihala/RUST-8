@@ -29,7 +29,7 @@ impl Interface{
     pub fn draw(&self, emulator :&Chip8, canvas :&mut Canvas<Window>) -> Result<(), String>{
         canvas.set_draw_color(Color::RGB(0,0,0));
         canvas.clear();
-        canvas.set_draw_color(Color::RGB(255,0,255));
+        canvas.set_draw_color(Color::RGB(0,255,102));
         
         
         let display = emulator.get_display();
@@ -74,7 +74,7 @@ impl Interface{
             let iterations = emulator.get_cycle_speed()/60;
             for _i in 0..iterations{
                 emulator.cycle();
-                self.draw(emulator, &mut canvas);
+                self.draw(emulator, &mut canvas).expect("Error drawing to screen");
             }
             
 
@@ -95,43 +95,43 @@ impl Interface{
                     } => break 'running,
                     Event::KeyDown { scancode: Some(scancode), .. } =>{
                         match scancode{
-                            sdl2::keyboard::Scancode::Num1 => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::Num2 => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::Num3 => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::Num4 => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::Q => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::W => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::E => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::R => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::A => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::S => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::D => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::F => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::Z => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::X => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::C => emulator.read_input(scancode.name(), Key::PRESSED),
-                            sdl2::keyboard::Scancode::V => emulator.read_input(scancode.name(), Key::PRESSED),
+                            sdl2::keyboard::Scancode::Num1 => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::Num2 => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::Num3 => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::Num4 => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::Q => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::W => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::E => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::R => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::A => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::S => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::D => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::F => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::Z => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::X => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::C => emulator.read_input(scancode.name(), Key::Pressed),
+                            sdl2::keyboard::Scancode::V => emulator.read_input(scancode.name(), Key::Pressed),
                             _ => println!("UNSUPPORTED KEY PRESSED")
                         }
                     },
                     Event::KeyUp { scancode: Some(scancode), .. } =>{
                         match scancode{
-                            sdl2::keyboard::Scancode::Num1 => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::Num2 => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::Num3 => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::Num4 => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::Q => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::W => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::E => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::R => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::A => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::S => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::D => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::F => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::Z => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::X => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::C => emulator.read_input(scancode.name(), Key::RELEASED),
-                            sdl2::keyboard::Scancode::V => emulator.read_input(scancode.name(), Key::RELEASED),
+                            sdl2::keyboard::Scancode::Num1 => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::Num2 => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::Num3 => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::Num4 => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::Q => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::W => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::E => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::R => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::A => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::S => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::D => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::F => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::Z => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::X => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::C => emulator.read_input(scancode.name(), Key::Released),
+                            sdl2::keyboard::Scancode::V => emulator.read_input(scancode.name(), Key::Released),
                             _ => println!("UNSUPPORTED KEY RELEASED")
                         }
                     },

@@ -3,8 +3,8 @@ use std::io::Read;
 use rand::random;
 
 pub enum Key{
-    PRESSED,
-    RELEASED
+    Pressed,
+    Released
 }
 
 pub struct Chip8 {
@@ -83,8 +83,11 @@ impl Chip8 {
     }
 
     pub fn read_input(&mut self, key_name : &str, input_state: Key){
-        let mut key_num :usize;
+        let mut key_num = 0;
         match key_name{
+            "1" => key_num = 1,
+            "2" => key_num = 2,
+            "3" => key_num = 3,
             "4" => key_num = 0xC,
             "Q" => key_num = 4,
             "W" => key_num = 5,
@@ -98,14 +101,14 @@ impl Chip8 {
             "X" => key_num = 0,
             "C" => key_num = 0xB,
             "V" => key_num = 0xF,
-            _ => key_num = key_name.parse().unwrap()
-        }
+            _ => ()
+        };
         
         // println!("Key: {} pressed", key_num);
     
         match input_state{
-            Key::PRESSED => self.keypad[key_num] = true,
-            Key::RELEASED => self.keypad[key_num] = false,
+            Key::Pressed => self.keypad[key_num] = true,
+            Key::Released => self.keypad[key_num] = false,
         }
         // println!("{}", self.keypad[key_num]);
     }
@@ -114,7 +117,7 @@ impl Chip8 {
         let mut file = File::open(path).expect("Invalid file path");
 
         let mut buffer : Vec<u8> = vec![];
-        let file_size = file.read_to_end(&mut buffer).expect("Error reading file");
+        let _file_size = file.read_to_end(&mut buffer).expect("Error reading file");
 
         let start_position = 0x200;
         self.memory[start_position..(start_position+buffer.len())].copy_from_slice(&buffer);
@@ -146,7 +149,7 @@ impl Chip8 {
         // let opcode_split: (u16, u16, u16, u16) = (digit_1, digit_2, digit_3, digit_4);
 
         match (digit_1, digit_2, digit_3, digit_4){
-            (0,0,0,0) => return,
+            (0,0,0,0) => (),
             //Clear screan
             (0,0,0xE,0) => self.display = [false; 64*32],
             //Jump
@@ -167,7 +170,7 @@ impl Chip8 {
             },
             //DXYN
             (0xD, _, _, _) =>{
-                let mut x_coord :i32 = (self.registers[digit_2  as usize] % 64).into();
+                let x_coord :i32 = (self.registers[digit_2  as usize] % 64).into();
                 let mut y_coord :i32 = (self.registers[digit_3 as usize] % 32).into();
                 let sprite_height = digit_4;
                 self.registers[0xF] = 0;
@@ -176,7 +179,7 @@ impl Chip8 {
                     let sprite_data_address = self.index_register + i;
                     let sprite_pixel_data :u8 = self.memory[sprite_data_address as usize];
 
-                    'draw_horizontal : for bit in (0..8).rev(){
+                    for bit in (0..8).rev(){
                         let pixel_bit = (sprite_pixel_data >> bit) & 1;
                         let curr_pixel = 7-bit;
                         if (self.display[((x_coord + curr_pixel) + (64 *  y_coord)) as usize] as u8 & pixel_bit) == 1 {
