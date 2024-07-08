@@ -1,4 +1,4 @@
-Rust-8 is a CHIP8 emulator/interpreter developed in Rust. It cuurently supports the basic functionality of the CHIP8 specification.
+Rust-8 is a CHIP8 emulator/interpreter developed in Rust. It currently supports the basic functionality of the CHIP8 specification.
 
 
 ## Installation
